@@ -4,6 +4,7 @@ plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.1.20"
     id("org.jetbrains.intellij.platform") version "2.5.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "cn.rtast.qwerty-learner"
@@ -20,10 +21,10 @@ repositories {
 dependencies {
     intellijPlatform {
         intellijIdeaCommunity("2024.3.5")
+//        pycharmCommunity("2024.3.5")
     }
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.14")
     implementation("cn.rtast:rtast-util-string:0.0.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
 }
 
 tasks {
@@ -40,4 +41,8 @@ tasks {
         sinceBuild.set("222")
         untilBuild.set("299.*")
     }
+}
+
+tasks.buildPlugin {
+    dependsOn(tasks.shadowJar)
 }

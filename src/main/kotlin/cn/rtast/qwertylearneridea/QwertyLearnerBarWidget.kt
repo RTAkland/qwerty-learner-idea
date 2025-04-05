@@ -20,8 +20,6 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.WindowManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.awt.Component
@@ -31,9 +29,8 @@ private const val url = "https://dict.youdao.com/suggest?num=1&ver=3.0&doctype=j
 
 class QwertyLearnerBarWidget(project: Project) : StatusBarWidget, StatusBarWidget.TextPresentation {
     private val selectionListener: SelectionListener
-    var translatedText: String = "QwertyLearner"
-    var client: OkHttpClient = OkHttpClient()
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private var translatedText: String = "QwertyLearner"
+    private var client = OkHttpClient()
 
     init {
         selectionListener = object : SelectionListener {
@@ -46,7 +43,7 @@ class QwertyLearnerBarWidget(project: Project) : StatusBarWidget, StatusBarWidge
                     object : Task.Backgroundable(project, "Get translate", true) {
                         override fun run(indicator: ProgressIndicator) {
                             val req = Request.Builder().get().url("$url$selectedText").build()
-                            val response = OkHttpClient().newCall(req).execute().body.string()
+                            val response = client.newCall(req).execute().body.string()
                             val resText = response.fromJson<TranslateResult>()
                             val result = resText.data.entries.first().entry + ": " + resText.data.entries.first().explain
                             translatedText = result
