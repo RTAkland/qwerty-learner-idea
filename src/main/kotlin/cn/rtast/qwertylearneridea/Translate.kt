@@ -6,13 +6,26 @@
 
 package cn.rtast.qwertylearneridea
 
-import cn.rtast.rutil.string.fromJson
-import com.intellij.openapi.application.ApplicationManager
-import okhttp3.*
+import cn.rtast.rutil.http.Http
+import cn.rtast.rutil.string.toJson
+import com.google.gson.annotations.SerializedName
 
+data class TranslateRequest(
+    val text: String,
+    @SerializedName("source_lang")
+    val sourceLang: String,
+    @SerializedName("target_lang")
+    val targetLang: String
+)
 
-fun getTranslate(text: String, callback: (String) -> Unit) {
-    ApplicationManager.getApplication().executeOnPooledThread {
+data class TranslateResponse(
+    val alternatives: List<String>
+)
 
-    }
+fun getTranslate(request: TranslateRequest): String {
+    return Http.post<TranslateResponse>(TRANSLATE_URL, request.toJson().apply {
+        println(this)
+    }).apply {
+        println(this)
+    }.alternatives.joinToString(", ")
 }

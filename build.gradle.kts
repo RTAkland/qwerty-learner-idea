@@ -25,6 +25,7 @@ dependencies {
     }
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.14")
     implementation("cn.rtast:rtast-util-string:0.0.1")
+    implementation("cn.rtast:rtast-util-http:0.0.1")
 }
 
 tasks {

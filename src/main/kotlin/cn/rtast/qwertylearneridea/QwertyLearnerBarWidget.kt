@@ -20,7 +20,6 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.WindowManager
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.awt.Component
 import java.util.regex.Pattern
@@ -30,7 +29,6 @@ private const val url = "https://dict.youdao.com/suggest?num=1&ver=3.0&doctype=j
 class QwertyLearnerBarWidget(project: Project) : StatusBarWidget, StatusBarWidget.TextPresentation {
     private val selectionListener: SelectionListener
     private var translatedText: String = "QwertyLearner"
-    private var client = OkHttpClient()
 
     init {
         selectionListener = object : SelectionListener {
@@ -42,11 +40,9 @@ class QwertyLearnerBarWidget(project: Project) : StatusBarWidget, StatusBarWidge
                 if (!selectedText.isEmpty() && (isEnglishStr(selectedText) || isChineseStr(selectedText))) {
                     object : Task.Backgroundable(project, "Get translate", true) {
                         override fun run(indicator: ProgressIndicator) {
-                            val req = Request.Builder().get().url("$url$selectedText").build()
-                            val response = client.newCall(req).execute().body.string()
-                            val resText = response.fromJson<TranslateResult>()
-                            val result = resText.data.entries.first().entry + ": " + resText.data.entries.first().explain
-                            translatedText = result
+                            val request = if (isEnglishStr(selectedText)) TranslateRequest(selectedText, "en", "zh")
+                            else TranslateRequest(selectedText, "zh", "en")
+                            translatedText = getTranslate(request)
                             val statusBar = WindowManager.getInstance().getStatusBar(project)
                             statusBar.updateWidget(ID())
                         }
